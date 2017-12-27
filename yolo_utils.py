@@ -1,8 +1,18 @@
-from mvnc import mvncapi as mvnc
-import sys,os,time,csv,getopt,cv2
 import numpy as np
-from datetime import datetime
+import cv2
 from skimage.transform import resize
+from config import cfg
+
+def preprocess_image(cv2_image):
+    # image preprocess
+    dim = cfg.MODEL_INPUT_SIZE
+    img = cv2_image
+    im = resize(img.copy()/255.0,dim,1)
+    #im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+    im = im[:,:,(2,1,0)]
+    #print('NEW shape:',im.shape)
+    #print(img[0,0,:],im[0,0,:])
+    return im
 
 def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, grid_size=7):
     # extract boxes from output
@@ -68,31 +78,6 @@ def iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_thresho
 
     return probs_filtered, boxes_filtered, classes_num_filtered
 
-
-def interpret_output(output, img_width, img_height):
-    classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
-    threshold = 0.2
-    iou_threshold = 0.5
-    num_class = 20
-    num_box = 2
-    grid_size = 7
-
-    # extract boxes from network output
-    boxes = preprocess_boxes(output, img_width, img_height, num_class, num_box, grid_size)
-
-    #filter boxes based on threshold
-    probs_filtered, boxes_filtered, classes_num_filtered = filter_boxes(output, boxes, grid_size, num_box, num_class, threshold)
-
-    #filter boxes based on IOU threshold
-    probs_filtered, boxes_filtered, classes_num_filtered = iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_threshold)
-
-    # write result
-    result = []
-    for i in range(len(boxes_filtered)):
-    	result.append([classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])
-
-    return result
-
 def iou(box1,box2):
 	tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
 	lr = min(box1[1]+0.5*box1[3],box2[1]+0.5*box2[3])-max(box1[1]-0.5*box1[3],box2[1]-0.5*box2[3])
@@ -134,48 +119,26 @@ def show_results(img, results, img_width, img_height):
 		cv2.imshow('YOLO detection',img_cp)
 		cv2.waitKey(1000)
 
-if len(sys.argv) != 2:
-	print ("YOLOv1 Tiny example: python3 py_examples/yolo_example.py images/dog.jpg")
-	sys.exit()
+def interpret_output(output, img_width, img_height):
+    classes = cfg.CLASSES
+    threshold = cfg.BOXES_FILTERING_THRESHOLD
+    iou_threshold = cfg.IOU_FILTERING_THRESHOLD
+    num_class = cfg.NUM_CLASSES
+    num_box = cfg.NUM_BOXES
+    grid_size = cfg.GRID_SIZE
 
-network_blob='graph'
-# configuration NCS
-mvnc.SetGlobalOption(mvnc.GlobalOption.LOG_LEVEL, 2)
-devices = mvnc.EnumerateDevices()
-if len(devices) == 0:
-	print('No devices found')
-	quit()
-device = mvnc.Device(devices[0])
-device.OpenDevice()
-opt = device.GetDeviceOption(mvnc.DeviceOption.OPTIMISATION_LIST)
-# load blob
-with open(network_blob, mode='rb') as f:
-	blob = f.read()
-graph = device.AllocateGraph(blob)
-graph.SetGraphOption(mvnc.GraphOption.ITERATIONS, 1)
-iterations = graph.GetGraphOption(mvnc.GraphOption.ITERATIONS)
-# image preprocess
-dim=(448,448)
-img = cv2.imread(sys.argv[1])
-im = resize(img.copy()/255.0,dim,1)
-#im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
-im = im[:,:,(2,1,0)]
-#print('NEW shape:',im.shape)
-#print(img[0,0,:],im[0,0,:])
-start = datetime.now()
-# start MOD
-graph.LoadTensor(im.astype(np.float16), 'user object')
-out, userobj = graph.GetResult()
-print('Graph output shape = {}'.format(out.shape))
-#
-end = datetime.now()
-elapsedTime = end-start
-print ('total time is " milliseconds', elapsedTime.total_seconds()*1000)
-results = interpret_output(out.astype(np.float32), img.shape[1], img.shape[0]) # fc27 instead of fc12 for yolo_small
-#print (results)
-#cv2.imshow('YOLO detection',img_cv)
-show_results(img, results, img.shape[1], img.shape[0])
-cv2.waitKey(10000)
-#
-graph.DeallocateGraph()
-device.CloseDevice()
+    # extract boxes from network output
+    boxes = preprocess_boxes(output, img_width, img_height, num_class, num_box, grid_size)
+
+    #filter boxes based on threshold
+    probs_filtered, boxes_filtered, classes_num_filtered = filter_boxes(output, boxes, grid_size, num_box, num_class, threshold)
+
+    #filter boxes based on IOU threshold
+    probs_filtered, boxes_filtered, classes_num_filtered = iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_threshold)
+
+    # write result
+    result = []
+    for i in range(len(boxes_filtered)):
+    	result.append([classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])
+
+    return result
