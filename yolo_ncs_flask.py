@@ -18,6 +18,15 @@ class CustomServer(Server):
         #Hint: Here you could manipulate app
         return Server.__call__(self, app, *args, **kwargs)
 
+
+class CustomServerRecorder(Server):
+    def __call__(self, app, *args, **kwargs):
+        # init NCS and camera_pi
+        init(True)
+
+        #Hint: Here you could manipulate app
+        return Server.__call__(self, app, *args, **kwargs)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -29,6 +38,7 @@ def video_feed():
 
 
 def read_camera(camera, yoloNCS):
+    global recorder_output
 
     while True:
         img = camera.get_frame_cv2_format()
@@ -40,14 +50,23 @@ def read_camera(camera, yoloNCS):
         #cv2.imshow('YOLO detection',img_cv)
         img = show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors, False)
 
+        if recorder_output:
+            # write the flipped frame
+            recorder_output.write(img)
+
         image_bytes = cv2.imencode('.jpg', img)[1].tostring()
 
         yield (b'--frame\r\n'
                b'Content-Type: image/bmp\r\n\r\n' + image_bytes + b'\r\n\r\n')
 
 
-def init():
-    global yoloNCS, camera
+def init(record=False):
+    global yoloNCS, camera, recorder_output
+
+    if record:
+        # Define the codec and create VideoWriter object
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        recorder_output = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
 
     # load NCS graph
     yoloNCS = YoloNCS('graph')
@@ -63,6 +82,7 @@ if __name__ == '__main__':
 
     # add runserver command to the manager
     manager.add_command('runserver', CustomServer())
+    manager.add_command('runserver_and_recorder', CustomServerRecorder())
 
     #run flask server
     manager.run()

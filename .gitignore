@@ -2,3 +2,4 @@ weights
 graph
 *.pyc
 __pycache__/*.pyc
+*.avi
