@@ -2,6 +2,17 @@ import numpy as np
 import cv2
 from skimage.transform import resize
 from yolo_config import cfg
+import colorsys
+import random
+
+def generate_colors(class_names):
+    hsv_tuples = [(x / len(class_names), 1., 1.) for x in range(len(class_names))]
+    colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
+    colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
+    random.seed(10101)  # Fixed seed for consistent colors across runs.
+    random.shuffle(colors)  # Shuffle colors to decorrelate adjacent classes.
+    random.seed(None)  # Reset seed to default.
+    return colors
 
 def preprocess_image(cv2_image):
     # image preprocess
@@ -87,7 +98,7 @@ def iou(box1,box2):
 	return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
 
-def show_results(img, results, img_width, img_height, imshow=True):
+def show_results(img, results, img_width, img_height, colors, imshow=True):
     img_cp = img.copy()
     disp_console = True
 
@@ -104,19 +115,19 @@ def show_results(img, results, img_width, img_height, imshow=True):
     	ymin = y-h
     	ymax = y+h
     	if xmin<0:
-    		xmin = 0
+    	    xmin = 0
     	if ymin<0:
-    		ymin = 0
+    	    ymin = 0
     	if xmax>img_width:
-    		xmax = img_width
+    	    xmax = img_width
     	if ymax>img_height:
-    		ymax = img_height
+    	    ymax = img_height
 
         # draw boxes and class_name
-    	cv2.rectangle(img_cp,(xmin,ymin),(xmax,ymax),(0,255,0),2)
+    	cv2.rectangle(img_cp,(xmin,ymin),(xmax,ymax),colors[cfg.CLASSES.index(results[i][0])],2)
     	#print ((xmin, ymin, xmax, ymax))
     	#cv2.rectangle(img_cp,(xmin,ymin-20),(xmax,ymin),(125,125,125),-1)
-    	cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(xmin+5,ymin-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),1)
+    	cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(xmin+5,ymin-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,colors[cfg.CLASSES.index(results[i][0])],2)
 
     if imshow:
         cv2.imshow('YOLO detection',img_cp)

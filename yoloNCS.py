@@ -1,8 +1,9 @@
 from mvnc import mvncapi as mvnc
-from yolo_utils import preprocess_image, interpret_output
+from yolo_utils import preprocess_image, interpret_output, generate_colors
 from datetime import datetime
 import numpy as np
 import sys
+from yolo_config import cfg
 
 class YoloNCS():
 
@@ -32,6 +33,9 @@ class YoloNCS():
         self.graph = self.device.AllocateGraph(blob)
         self.graph.SetGraphOption(mvnc.GraphOption.ITERATIONS, 1)
         iterations = self.graph.GetGraphOption(mvnc.GraphOption.ITERATIONS)
+
+        # Generate colors for drawing bounding boxes.
+        self.colors = generate_colors(cfg.CLASSES)
 
     def close_ressources(self):
         # deallocate ressources

@@ -38,7 +38,7 @@ def read_camera(camera, yoloNCS):
 
         #print (results)
         #cv2.imshow('YOLO detection',img_cv)
-        img = show_results(img, results, img.shape[1], img.shape[0], False)
+        img = show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors, False)
 
         image_bytes = cv2.imencode('.jpg', img)[1].tostring()
 
