@@ -2,6 +2,7 @@ from mvnc import mvncapi as mvnc
 from yolo_utils import preprocess_image, interpret_output
 from datetime import datetime
 import numpy as np
+import sys
 
 class YoloNCS():
 
@@ -13,7 +14,15 @@ class YoloNCS():
         if len(devices) == 0:
         	print('No devices found')
         	quit()
+
         self.device = mvnc.Device(devices[0])
+
+        # try to close the NVC device in case it has not been properly closed before
+        try:
+            self.device.CloseDevice()
+        except Exception as e:
+            print('No device to be shutdown: {}'.format(e))
+
         self.device.OpenDevice()
         opt = self.device.GetDeviceOption(mvnc.DeviceOption.OPTIMISATION_LIST)
         # load blob
@@ -37,11 +46,11 @@ class YoloNCS():
         # start MOD
         self.graph.LoadTensor(im.astype(np.float16), 'user object')
         out, userobj = self.graph.GetResult()
-        print('Graph output shape = {}'.format(out.shape))
+        #print('Graph output shape = {}'.format(out.shape))
         #
         end = datetime.now()
         elapsedTime = end-start
-        print ('total time is " milliseconds', elapsedTime.total_seconds()*1000)
+        print ('process {} image in {} milliseconds'.format(cv2_image.shape, elapsedTime.total_seconds()*1000))
         results = interpret_output(out.astype(np.float32), cv2_image.shape[1], cv2_image.shape[0]) # fc27 instead of fc12 for yolo_small
 
         return results

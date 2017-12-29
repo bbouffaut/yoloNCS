@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from skimage.transform import resize
-from config import cfg
+from yolo_config import cfg
 
 def preprocess_image(cv2_image):
     # image preprocess
@@ -18,7 +18,8 @@ def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, gri
     # extract boxes from output
     w_img = img_width
     h_img = img_height
-    print ((w_img, h_img))
+    #debug
+    #print ((w_img, h_img))
 
     boxes = (np.reshape(output[1078:],(grid_size, grid_size, num_box, 4)))#.copy()
     offset = np.transpose(np.reshape(np.array([np.arange(grid_size)]*(grid_size*2)),(2,grid_size,grid_size)),(1,2,0))
@@ -86,38 +87,43 @@ def iou(box1,box2):
 	return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
 
-def show_results(img, results, img_width, img_height):
-	img_cp = img.copy()
-	disp_console = True
-	imshow = True
-#	if self.filewrite_txt :
-#		ftxt = open(self.tofile_txt,'w')
-	for i in range(len(results)):
-		x = int(results[i][1])
-		y = int(results[i][2])
-		w = int(results[i][3])//2
-		h = int(results[i][4])//2
-		if disp_console : print ('    class : ' + results[i][0] + ' , [x,y,w,h]=[' + str(x) + ',' + str(y) + ',' + str(int(results[i][3])) + ',' + str(int(results[i][4]))+'], Confidence = ' + str(results[i][5]) )
-		xmin = x-w
-		xmax = x+w
-		ymin = y-h
-		ymax = y+h
-		if xmin<0:
-			xmin = 0
-		if ymin<0:
-			ymin = 0
-		if xmax>img_width:
-			xmax = img_width
-		if ymax>img_height:
-			ymax = img_height
-		if  imshow:
-			cv2.rectangle(img_cp,(xmin,ymin),(xmax,ymax),(0,255,0),2)
-			#print ((xmin, ymin, xmax, ymax))
-			#cv2.rectangle(img_cp,(xmin,ymin-20),(xmax,ymin),(125,125,125),-1)
-			cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(xmin+5,ymin-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),1)
-	if imshow :
-		cv2.imshow('YOLO detection',img_cp)
-		cv2.waitKey(1000)
+def show_results(img, results, img_width, img_height, imshow=True):
+    img_cp = img.copy()
+    disp_console = True
+
+    #	if self.filewrite_txt :
+    #		ftxt = open(self.tofile_txt,'w')
+    for i in range(len(results)):
+    	x = int(results[i][1])
+    	y = int(results[i][2])
+    	w = int(results[i][3])//2
+    	h = int(results[i][4])//2
+    	if disp_console : print ('    class : ' + results[i][0] + ' , [x,y,w,h]=[' + str(x) + ',' + str(y) + ',' + str(int(results[i][3])) + ',' + str(int(results[i][4]))+'], Confidence = ' + str(results[i][5]) )
+    	xmin = x-w
+    	xmax = x+w
+    	ymin = y-h
+    	ymax = y+h
+    	if xmin<0:
+    		xmin = 0
+    	if ymin<0:
+    		ymin = 0
+    	if xmax>img_width:
+    		xmax = img_width
+    	if ymax>img_height:
+    		ymax = img_height
+
+        # draw boxes and class_name
+    	cv2.rectangle(img_cp,(xmin,ymin),(xmax,ymax),(0,255,0),2)
+    	#print ((xmin, ymin, xmax, ymax))
+    	#cv2.rectangle(img_cp,(xmin,ymin-20),(xmax,ymin),(125,125,125),-1)
+    	cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(xmin+5,ymin-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),1)
+
+    if imshow:
+        cv2.imshow('YOLO detection',img_cp)
+        cv2.waitKey(1000)
+
+    else:
+        return img_cp
 
 def interpret_output(output, img_width, img_height):
     classes = cfg.CLASSES
