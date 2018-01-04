@@ -153,7 +153,7 @@ def interpret_output(output, img_width, img_height):
     #filter boxes based on IOU threshold
     probs_filtered, boxes_filtered, classes_num_filtered = iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_threshold)
 
-    # write result
+    #write result
     result = []
     for i in range(len(boxes_filtered)):
     	result.append([classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])

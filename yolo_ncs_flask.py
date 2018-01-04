@@ -80,7 +80,7 @@ def init(record=False):
 
 if __name__ == '__main__':
 
-    # add runserver command to the manager
+    #add runserver command to the manager
     manager.add_command('runserver', CustomServer())
     manager.add_command('runserver_and_recorder', CustomServerRecorder())
 
