@@ -24,8 +24,12 @@ class YoloNCS():
         except Exception as e:
             print('No device to be shutdown: {}'.format(e))
 
-        self.device.OpenDevice()
-        opt = self.device.GetDeviceOption(mvnc.DeviceOption.OPTIMISATION_LIST)
+        try:
+            self.device.OpenDevice()
+            opt = self.device.GetDeviceOption(mvnc.DeviceOption.OPTIMISATION_LIST)
+        except Exception as e:
+            print('Error opening NCS device: {}'.format(e))
+
         # load blob
         with open(network_blob, mode='rb') as f:
         	blob = f.read()
