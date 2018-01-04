@@ -41,17 +41,17 @@ def signal_handler(signal, frame):
 
     print('You pressed Ctrl+C!')
 
-    # stop recording video
+    #stop recording video
     if recorder_output is not None:
         recorder_output.release()
 
-    # stop camera's thread
+    #stop camera's thread
     camera.join()
 
     # stop NCS ressources
     yoloNCS.close_ressources()
 
-    # exit
+    #exit
     sys.exit(0)
 
 def read_camera(camera, yoloNCS):
