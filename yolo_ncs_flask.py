@@ -50,7 +50,7 @@ def read_camera(camera, yoloNCS):
         #cv2.imshow('YOLO detection',img_cv)
         img = show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors, False)
 
-        if recorder_output:
+        if recorder_output is not None:
             # write the flipped frame
             recorder_output.write(img)
 
@@ -62,6 +62,8 @@ def read_camera(camera, yoloNCS):
 
 def init(record=False):
     global yoloNCS, camera, recorder_output
+
+    recorder_output = None
 
     if record:
         # Define the codec and create VideoWriter object
