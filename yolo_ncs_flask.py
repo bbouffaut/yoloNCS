@@ -55,7 +55,7 @@ def close():
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
 
-    # close ressources
+    #close ressources
     close()
 
     #exit
