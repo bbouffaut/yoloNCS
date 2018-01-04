@@ -59,7 +59,8 @@ def signal_handler(signal, frame):
     close()
 
     #exit
-    sys.exit(0)
+    #sys.exit(0)
+    raise SystemExit
 
 def read_camera(camera, yoloNCS):
     global recorder_output
