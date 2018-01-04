@@ -19,10 +19,10 @@ class YoloNCS():
         self.device = mvnc.Device(devices[0])
 
         #try to close the NVC device in case it has not been properly closed before
-        try:
-            self.device.CloseDevice()
-        except Exception as e:
-            print('No device to be shutdown: {}'.format(e))
+        #try:
+        #    self.device.CloseDevice()
+        #except Exception as e:
+        #    print('No device to be shutdown: {}'.format(e))
 
         try:
             self.device.OpenDevice()
