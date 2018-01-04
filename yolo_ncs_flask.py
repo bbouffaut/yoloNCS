@@ -1,8 +1,8 @@
 import sys, cv2
 from yoloNCS import YoloNCS
 from yolo_utils import show_results
-#from streaming.camera_pi import VideoCameraPi
-from streaming.camera import VideoCamera
+from streaming.camera_pi import VideoCameraPi
+#from streaming.camera import VideoCamera
 import time
 from flask import Flask, render_template, Response
 from flask_script import Manager, Server
@@ -72,10 +72,10 @@ def init(record=False):
     yoloNCS = YoloNCS('graph')
 
     #Raaspberry Pi version
-    #camera = VideoCameraPi()
+    camera = VideoCameraPi()
 
     # laptop internal webcam
-    camera = VideoCamera()
+    #camera = VideoCamera()
 
 
 if __name__ == '__main__':
