@@ -1,4 +1,4 @@
-import sys, cv2
+import sys, cv2, signal
 from yoloNCS import YoloNCS
 from yolo_utils import show_results
 from streaming.camera_pi import VideoCameraPi
@@ -36,6 +36,23 @@ def video_feed():
     global camera, yoloNCS
     return Response(read_camera(camera, yoloNCS),mimetype='multipart/x-mixed-replace; boundary=frame')
 
+def signal_handler(signal, frame):
+    global yoloNCS, camera, recorder_output
+
+    print('You pressed Ctrl+C!')
+
+    # stop recording video
+    if recorder_output is not None:
+        recorder_output.release()
+
+    # stop camera's thread
+    camera.join()
+
+    # stop NCS ressources
+    yoloNCS.close_ressources()
+
+    # exit
+    sys.exit(0)
 
 def read_camera(camera, yoloNCS):
     global recorder_output
@@ -85,6 +102,9 @@ if __name__ == '__main__':
     #add runserver command to the manager
     manager.add_command('runserver', CustomServer())
     manager.add_command('runserver_and_recorder', CustomServerRecorder())
+
+    # catch Ctrl+C signal
+    signal.signal(signal.SIGINT, signal_handler)
 
     #run flask server
     manager.run()
