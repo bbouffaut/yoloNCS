@@ -36,10 +36,11 @@ def video_feed():
     global camera, yoloNCS
     return Response(read_camera(camera, yoloNCS),mimetype='multipart/x-mixed-replace; boundary=frame')
 
-def signal_handler(signal, frame):
+
+def close():
     global yoloNCS, camera, recorder_output
 
-    print('You pressed Ctrl+C!')
+    print('Closing resources now...')
 
     #stop recording video
     if recorder_output is not None:
@@ -50,6 +51,12 @@ def signal_handler(signal, frame):
 
     # stop NCS ressources
     yoloNCS.close_ressources()
+
+def signal_handler(signal, frame):
+    print('You pressed Ctrl+C!')
+
+    # close ressources
+    close()
 
     #exit
     sys.exit(0)
@@ -99,12 +106,17 @@ def init(record=False):
 
 if __name__ == '__main__':
 
-    #add runserver command to the manager
-    manager.add_command('runserver', CustomServer())
-    manager.add_command('runserver_and_recorder', CustomServerRecorder())
+    try:
 
-    # catch Ctrl+C signal
-    signal.signal(signal.SIGINT, signal_handler)
+        #add runserver command to the manager
+        manager.add_command('runserver', CustomServer())
+        manager.add_command('runserver_and_recorder', CustomServerRecorder())
 
-    #run flask server
-    manager.run()
+        # catch Ctrl+C signal
+        signal.signal(signal.SIGINT, signal_handler)
+
+        #run flask server
+        manager.run()
+
+    except Exception as e:
+        print('Exit program')
