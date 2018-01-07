@@ -1,8 +1,6 @@
-import sys, cv2
+import sys, cv2, os
 from yoloNCS import YoloNCS
 from yolo_utils import show_results
-#from streaming.camera_pi import VideoCameraPi
-from streaming.camera import VideoCamera
 import time
 
 
@@ -16,7 +14,7 @@ def read_camera(camera, yoloNCS):
 
         #print (results)
         #cv2.imshow('YOLO detection',img_cv)
-        show_results(img, results, img.shape[1], img.shape[0])
+        show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors)
 
         # Press Q on keyboard to  exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -24,16 +22,24 @@ def read_camera(camera, yoloNCS):
             yoloNCS.close_ressources()
             break
 
+def get_camera():
+    if os.uname()[4].startswith("arm"):
+        #Raaspberry Pi version
+        from streaming.camera_pi import VideoCameraPi
+        camera = VideoCameraPi()
+    else:
+        # laptop internal webcam
+        from streaming.camera import VideoCamera
+        camera = VideoCamera()
+    return camera
+
 
 if __name__ == '__main__':
     # load NCS graph
     yoloNCS = YoloNCS('graph')
 
-    #Raaspberry Pi version
-    #camera = VideoCameraPi()
-
-    # laptop internal webcam
-    camera = VideoCamera()
+    # get the right camera
+    camera = get_camera()
 
     #wait camera has started
     time.sleep(1)

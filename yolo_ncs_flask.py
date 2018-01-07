@@ -1,8 +1,6 @@
 import sys, cv2, signal
 from yoloNCS import YoloNCS
 from yolo_utils import show_results
-from streaming.camera_pi import VideoCameraPi
-#from streaming.camera import VideoCamera
 import time
 from flask import Flask, render_template, Response
 from flask_script import Manager, Server
@@ -85,6 +83,18 @@ def read_camera(camera, yoloNCS):
                b'Content-Type: image/bmp\r\n\r\n' + image_bytes + b'\r\n\r\n')
 
 
+def get_camera():
+    if os.uname()[4].startswith("arm"):
+        #Raaspberry Pi version
+        from streaming.camera_pi import VideoCameraPi
+        camera = VideoCameraPi()
+    else:
+        # laptop internal webcam
+        from streaming.camera import VideoCamera
+        camera = VideoCamera()
+    return camera
+
+
 def init(record=False):
     global yoloNCS, camera, recorder_output
 
@@ -98,11 +108,8 @@ def init(record=False):
     # load NCS graph
     yoloNCS = YoloNCS('graph')
 
-    #Raaspberry Pi version
-    camera = VideoCameraPi()
-
-    # laptop internal webcam
-    #camera = VideoCamera()
+    # load the right camera
+    camera = get_camera()
 
 
 if __name__ == '__main__':
