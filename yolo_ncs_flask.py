@@ -1,7 +1,7 @@
 import sys, cv2, signal
 from yoloNCS import YoloNCS
 from yolo_utils import show_results
-import time
+import time, os
 from flask import Flask, render_template, Response
 from flask_script import Manager, Server
 
@@ -127,4 +127,4 @@ if __name__ == '__main__':
         manager.run()
 
     except Exception as e:
-        print('Exit program')
+        print('Exit program with Exception {}'.format(e.args))
