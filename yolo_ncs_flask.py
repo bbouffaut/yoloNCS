@@ -86,10 +86,12 @@ def read_camera(camera, yoloNCS):
 def get_camera():
     if os.uname()[4].startswith("arm"):
         #Raaspberry Pi version
+        print('Raspberry Pi platform detected')
         from streaming.camera_pi import VideoCameraPi
         camera = VideoCameraPi()
     else:
         # laptop internal webcam
+        print('linux platform detected')
         from streaming.camera import VideoCamera
         camera = VideoCamera()
     return camera
