@@ -9,12 +9,13 @@ def read_camera(camera, yoloNCS):
     while True:
         img = camera.get_frame_cv2_format()
 
-        #process Ylol algorithm with NCS Graph
-        results = yoloNCS.process_image(img)
+        if img is not None:
+            #process Ylol algorithm with NCS Graph
+            results = yoloNCS.process_image(img)
 
-        #print (results)
-        #cv2.imshow('YOLO detection',img_cv)
-        show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors)
+            #print (results)
+            #cv2.imshow('YOLO detection',img_cv)
+            show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors)
 
         # Press Q on keyboard to  exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -25,10 +26,12 @@ def read_camera(camera, yoloNCS):
 def get_camera():
     if os.uname()[4].startswith("arm"):
         #Raaspberry Pi version
+        print('Use R-Pi camera')
         from streaming.camera_pi import VideoCameraPi
         camera = VideoCameraPi()
     else:
         # laptop internal webcam
+        print('Use laptop webcam')
         from streaming.camera import VideoCamera
         camera = VideoCamera()
     return camera
