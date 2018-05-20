@@ -113,7 +113,7 @@ def init(record=False):
         recorder_output = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
 
     # load NCS graph
-    yoloNCS = YoloNCS('graph')
+    yoloNCS = YoloNCS('graphs/graph_ncappzoo')
 
     # load the right camera
     camera = get_camera()

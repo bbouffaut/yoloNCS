@@ -39,7 +39,7 @@ def get_camera():
 
 if __name__ == '__main__':
     # load NCS graph
-    yoloNCS = YoloNCS('graph')
+    yoloNCS = YoloNCS('graphs/graph_ncappzoo')
 
     # get the right camera
     camera = get_camera()
