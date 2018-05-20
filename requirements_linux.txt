@@ -1,0 +1,7 @@
+Flask==0.12.2
+six==1.10.0
+matplotlib==2.1.1
+opencv_python==3.4.0.12
+easydict==1.7
+Flask_Script==2.0.6
+numpy==1.12.1

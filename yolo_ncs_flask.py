@@ -66,21 +66,26 @@ def read_camera(camera, yoloNCS):
     while True:
         img = camera.get_frame_cv2_format()
 
-        #process Ylol algorithm with NCS Graph
-        results = yoloNCS.process_image(img)
+        if img is not None:
 
-        #print (results)
-        #cv2.imshow('YOLO detection',img_cv)
-        img = show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors, False)
+            #process Ylol algorithm with NCS Graph
+            results = yoloNCS.process_image(img)
 
-        if recorder_output is not None:
-            # write the flipped frame
-            recorder_output.write(img)
+            #print (results)
+            #cv2.imshow('YOLO detection',img_cv)
+            img = show_results(img, results, img.shape[1], img.shape[0], yoloNCS.colors, False)
 
-        image_bytes = cv2.imencode('.jpg', img)[1].tostring()
+            if recorder_output is not None:
+                # write the flipped frame
+                recorder_output.write(img)
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/bmp\r\n\r\n' + image_bytes + b'\r\n\r\n')
+            image_bytes = cv2.imencode('.jpg', img)[1].tostring()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/bmp\r\n\r\n' + image_bytes + b'\r\n\r\n')
+
+        else:
+            raise Exception('image is None')
 
 
 def get_camera():
@@ -112,6 +117,9 @@ def init(record=False):
 
     # load the right camera
     camera = get_camera()
+
+    if camera is None:
+        raise Exception("camera can't be opened")
 
 
 if __name__ == '__main__':
