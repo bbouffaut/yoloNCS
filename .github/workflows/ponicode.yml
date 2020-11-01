@@ -24,7 +24,7 @@ jobs:
         repo_path: ./
         auth_token: ${{ secrets.PONICODE_TOKEN }}
         all_repo: true
-        enable_templates: true
+        enable_template: true
         # Creates pull request with all changes in file
     - name: Create Pull Request 
       uses: peter-evans/create-pull-request@v2 
