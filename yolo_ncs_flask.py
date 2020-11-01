@@ -10,6 +10,10 @@ manager = Manager(app)
 
 class CustomServer(Server):
     def __call__(self, app, *args, **kwargs):
+        """
+        Calls the call to the app.
+
+        """
         # init NCS and camera_pi
         init()
 
@@ -19,6 +23,10 @@ class CustomServer(Server):
 
 class CustomServerRecorder(Server):
     def __call__(self, app, *args, **kwargs):
+        """
+        Calls the app.
+
+        """
         # init NCS and camera_pi
         init(True)
 
@@ -27,15 +35,27 @@ class CustomServerRecorder(Server):
 
 @app.route('/')
 def index():
+    """
+    Render the index.
+
+    """
     return render_template('index.html')
 
 @app.route('/video_feed')
 def video_feed():
+    """
+    Reads a video from the video.
+
+    """
     global camera, yoloNCS
     return Response(read_camera(camera, yoloNCS),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 def close():
+    """
+    Close all active camera outputs.
+
+    """
     global yoloNCS, camera, recorder_output
 
     print('Closing resources now...')
@@ -51,6 +71,10 @@ def close():
     yoloNCS.close_ressources()
 
 def signal_handler(signal, frame):
+    """
+    Signal handler.
+
+    """
     print('You pressed Ctrl+C!')
 
     #close ressources
@@ -61,6 +85,10 @@ def signal_handler(signal, frame):
     raise SystemExit
 
 def read_camera(camera, yoloNCS):
+    """
+    Reads an iterator of images from an image.
+
+    """
     global recorder_output
 
     while True:
@@ -89,6 +117,10 @@ def read_camera(camera, yoloNCS):
 
 
 def get_camera():
+    """
+    Return a camera object
+
+    """
     if os.uname()[4].startswith("arm"):
         #Raaspberry Pi version
         print('Raspberry Pi platform detected')
@@ -103,6 +135,10 @@ def get_camera():
 
 
 def init(record=False):
+    """
+    Initialize the camera.
+
+    """
     global yoloNCS, camera, recorder_output
 
     recorder_output = None

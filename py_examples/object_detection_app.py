@@ -14,6 +14,10 @@ num_box = 2
 grid_size = 7
 
 def show_results(img, results, img_width, img_height):
+    """
+    Show results of the result.
+
+    """
     img_cp = img
     disp_console = False
     imshow = True
@@ -45,6 +49,10 @@ def show_results(img, results, img_width, img_height):
 
 
 def interpret_output(output, img_width, img_height):
+    """
+    Takes a 2d numpy.
+
+    """
     w_img = img_width
     h_img = img_height
     probs = np.zeros((7,7,2,20))
@@ -99,6 +107,10 @@ def interpret_output(output, img_width, img_height):
     return result
 
 def iou(box1,box2):
+    """
+    Computes the intersection of two boxes.
+
+    """
 	tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
 	lr = min(box1[1]+0.5*box1[3],box2[1]+0.5*box2[3])-max(box1[1]-0.5*box1[3],box2[1]-0.5*box2[3])
 	if tb < 0 or lr < 0 : intersection = 0
@@ -106,6 +118,10 @@ def iou(box1,box2):
 	return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
 def worker(graph, input_q, output_q):
+    """
+    Evaluate the graph
+
+    """
     fps = FPS().start()
     while True:
         fps.update()

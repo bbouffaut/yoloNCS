@@ -14,6 +14,10 @@ import numpy as np
 import sys, getopt
 
 def main(argv):
+    """
+    Main function.
+
+    """
 	model_filename = ''
 	yoloweight_filename = ''
 	caffemodel_filename = ''

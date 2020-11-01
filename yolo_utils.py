@@ -6,6 +6,10 @@ import colorsys
 import random
 
 def generate_colors(class_names):
+    """
+    Generate colors.
+
+    """
     hsv_tuples = [(x / len(class_names), 1., 1.) for x in range(len(class_names))]
     colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
     colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
@@ -15,6 +19,10 @@ def generate_colors(class_names):
     return colors
 
 def preprocess_image(cv2_image):
+    """
+    Preprocess an image
+
+    """
     # image preprocess
     dim = cfg.MODEL_INPUT_SIZE
     img = cv2_image
@@ -26,6 +34,10 @@ def preprocess_image(cv2_image):
     return im
 
 def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, grid_size=7):
+    """
+    Preprocess boxes.
+
+    """
     # extract boxes from output
     w_img = img_width
     h_img = img_height
@@ -49,6 +61,10 @@ def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, gri
     return boxes
 
 def filter_boxes(output, boxes, grid_size, num_box, num_class, threshold=0.2):
+    """
+    Filter boxes based on the given grid.
+
+    """
 
     # Filter boexes based on computed probability and threshol
 
@@ -76,6 +92,10 @@ def filter_boxes(output, boxes, grid_size, num_box, num_class, threshold=0.2):
     return probs_filtered, boxes_filtered, classes_num_filtered
 
 def iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_threshold=0.5):
+    """
+    Filters out the filtered filtered by each set is in each set.
+
+    """
 
     for i in range(len(boxes_filtered)):
     	if probs_filtered[i] == 0 : continue
@@ -91,6 +111,10 @@ def iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_thresho
     return probs_filtered, boxes_filtered, classes_num_filtered
 
 def iou(box1,box2):
+    """
+    Computes the intersection of two boxes.
+
+    """
 	tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
 	lr = min(box1[1]+0.5*box1[3],box2[1]+0.5*box2[3])-max(box1[1]-0.5*box1[3],box2[1]-0.5*box2[3])
 	if tb < 0 or lr < 0 : intersection = 0
@@ -99,6 +123,10 @@ def iou(box1,box2):
 
 
 def show_results(img, results, img_width, img_height, colors, imshow=True):
+    """
+    Show the results in an image.
+
+    """
     img_cp = img.copy()
     disp_console = True
 
@@ -137,6 +165,10 @@ def show_results(img, results, img_width, img_height, colors, imshow=True):
         return img_cp
 
 def interpret_output(output, img_width, img_height):
+    """
+    Returns a list of - like numpy array
+
+    """
     classes = cfg.CLASSES
     threshold = cfg.BOXES_FILTERING_THRESHOLD
     iou_threshold = cfg.IOU_FILTERING_THRESHOLD

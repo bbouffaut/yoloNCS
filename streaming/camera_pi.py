@@ -7,6 +7,10 @@ import cv2
 class VideoCameraPi(threading.Thread):
 
     def __init__(self):
+        """
+        Initialize the camera.
+
+        """
         threading.Thread.__init__(self)
         #initialize the camera and grab a reference to the raw camera capture
         self.camera = PiCamera()
@@ -19,6 +23,10 @@ class VideoCameraPi(threading.Thread):
         self.start()
 
     def run(self):
+        """
+        Run the image
+
+        """
         #implement a video frame buffering thread
         self.lock = threading.Lock()
 
@@ -35,6 +43,10 @@ class VideoCameraPi(threading.Thread):
             self.rawCapture.truncate(0)
 
     def get_frame_cv2_format(self):
+        """
+        Get image format
+
+        """
 
         self.lock.acquire()
         image = self.image

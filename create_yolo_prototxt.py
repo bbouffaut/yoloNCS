@@ -8,11 +8,19 @@ import sys
 
 class CaffeLayerGenerator(object):
     def __init__(self, name, ltype):
+        """
+        Initialize a new instance.
+
+        """
         self.name = name
         self.bottom = []
         self.top = []
         self.type = ltype
     def get_template(self):
+        """
+        Return a string representation of this template.
+
+        """
         return """
 layer {{{{
   name: "{}"
@@ -23,11 +31,19 @@ layer {{{{
 
 class CaffeInputLayer(CaffeLayerGenerator):
     def __init__(self, name, channels, width, height):
+        """
+        Initialize the window.
+
+        """
         super(CaffeInputLayer, self).__init__(name, 'Input')
         self.channels = channels
         self.width = width
         self.height = height
     def write(self, f):
+        """
+        Writes the image to a file.
+
+        """
         f.write("""
 input: "{}"
 input_shape {{
@@ -39,6 +55,10 @@ input_shape {{
 
 class CaffeConvolutionLayer(CaffeLayerGenerator):
     def __init__(self, name, filters, ksize=None, stride=None, pad=None, bias=True):
+        """
+        Initialize the network.
+
+        """
         super(CaffeConvolutionLayer, self).__init__(name, 'Convolution')
         self.filters = filters
         self.ksize = ksize
@@ -46,6 +66,10 @@ class CaffeConvolutionLayer(CaffeLayerGenerator):
         self.pad = pad
         self.bias = bias
     def write(self, f):
+        """
+        Writes the options to the file - like object f.
+
+        """
         opts = ['']
         if self.ksize is not None: opts.append('kernel_size: {}'.format(self.ksize))
         if self.stride is not None: opts.append('stride: {}'.format(self.stride))
@@ -59,6 +83,10 @@ class CaffeConvolutionLayer(CaffeLayerGenerator):
 
 class CaffePoolingLayer(CaffeLayerGenerator):
     def __init__(self, name, pooltype, ksize=None, stride=None, pad=None, global_pooling=None):
+        """
+        Initialize the pool.
+
+        """
         super(CaffePoolingLayer, self).__init__(name, 'Pooling')
         self.pooltype = pooltype
         self.ksize = ksize
@@ -66,6 +94,10 @@ class CaffePoolingLayer(CaffeLayerGenerator):
         self.pad = pad
         self.global_pooling = global_pooling
     def write(self, f):
+        """
+        Writes the given parameters to a file.
+
+        """
         opts = ['']
         if self.ksize is not None: opts.append('kernel_size: {}'.format(self.ksize))
         if self.stride is not None: opts.append('stride: {}'.format(self.stride))
@@ -79,9 +111,17 @@ class CaffePoolingLayer(CaffeLayerGenerator):
 
 class CaffeInnerProductLayer(CaffeLayerGenerator):
     def __init__(self, name, num_output):
+        """
+        Initialize a new instance.
+
+        """
         super(CaffeInnerProductLayer, self).__init__(name, 'InnerProduct')
         self.num_output = num_output
     def write(self, f):
+        """
+        Write the given file.
+
+        """
         param_str = """
   inner_product_param {{
     num_output: {}
@@ -90,8 +130,16 @@ class CaffeInnerProductLayer(CaffeLayerGenerator):
 
 class CaffeBatchNormLayer(CaffeLayerGenerator):
     def __init__(self, name):
+        """
+        Initialize a batch object.
+
+        """
         super(CaffeBatchNormLayer, self).__init__(name, 'BatchNorm')
     def write(self, f):
+        """
+        Writes the configuration to the given file.
+
+        """
         param_str = """
   batch_norm_param {
     use_global_stats: true
@@ -100,8 +148,16 @@ class CaffeBatchNormLayer(CaffeLayerGenerator):
 
 class CaffeScaleLayer(CaffeLayerGenerator):
     def __init__(self, name):
+        """
+        Initialize a class
+
+        """
         super(CaffeScaleLayer, self).__init__(name, 'Scale')
     def write(self, f):
+        """
+        Writes the configuration to the given file.
+
+        """
         param_str = """
   scale_param {
     bias_term: true
@@ -110,9 +166,17 @@ class CaffeScaleLayer(CaffeLayerGenerator):
 
 class CaffeReluLayer(CaffeLayerGenerator):
     def __init__(self, name, negslope=None):
+        """
+        Initialize the working directory.
+
+        """
         super(CaffeReluLayer, self).__init__(name, 'Relu')
         self.negslope = negslope
     def write(self, f):
+        """
+        Writes the configuration file.
+
+        """
         param_str = ""
         if self.negslope is not None:
             param_str = """
@@ -123,9 +187,17 @@ class CaffeReluLayer(CaffeLayerGenerator):
 
 class CaffeDropoutLayer(CaffeLayerGenerator):
     def __init__(self, name, prob):
+        """
+        Initialize the probabilities.
+
+        """
         super(CaffeDropoutLayer, self).__init__(name, 'Dropout')
         self.prob = prob
     def write(self, f):
+        """
+        Writes the template to a file.
+
+        """
         param_str = """
   dropout_param {{
     dropout_ratio: {}
@@ -134,25 +206,49 @@ class CaffeDropoutLayer(CaffeLayerGenerator):
 
 class CaffeSoftmaxLayer(CaffeLayerGenerator):
     def __init__(self, name):
+        """
+        Initializes the name
+
+        """
         super(CaffeSoftmaxLayer, self).__init__(name, 'Softmax')
     def write(self, f):
+        """
+        Write the configuration to a file.
+
+        """
         f.write(self.get_template().format(""))
 
 class CaffeProtoGenerator:
     def __init__(self, name):
+        """
+        Initialize the layer.
+
+        """
         self.name = name
         self.sections = []
         self.lnum = 0
         self.layer = None
     def add_layer(self, l):
+        """
+        Add a layer
+
+        """
         self.sections.append( l )
     def add_input_layer(self, items):
+        """
+        Add a layer to the layer
+
+        """
         self.lnum = 0
         lname = "data"
         self.layer = CaffeInputLayer(lname, items['channels'], items['width'], items['height'])
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_convolution_layer(self, items):
+        """
+        Add convolution layer.
+
+        """
         self.lnum += 1
         prev_blob = self.layer.top[0]
         lname = "conv"+str(self.lnum)
@@ -166,6 +262,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_innerproduct_layer(self, items):
+        """
+        Add a layer to the layer.
+
+        """
         self.lnum += 1
         prev_blob = self.layer.top[0]
         lname = "fc"+str(self.lnum)
@@ -175,6 +275,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_pooling_layer(self, ltype, items, global_pooling=None):
+        """
+        Add a layer to pool layer.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "pool"+str(self.lnum)
         ksize = items['size'] if 'size' in items else None
@@ -185,6 +289,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_batchnorm_layer(self, items):
+        """
+        Add a layer to the batch.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "bn"+str(self.lnum)
         self.layer = CaffeBatchNormLayer( lname )
@@ -192,6 +300,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_scale_layer(self, items):
+        """
+        Add layer to the layer.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "scale"+str(self.lnum)
         self.layer = CaffeScaleLayer( lname )
@@ -199,6 +311,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def add_relu_layer(self, items):
+        """
+        Add a layer to layer.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "relu"+str(self.lnum)
         self.layer = CaffeReluLayer( lname )
@@ -206,6 +322,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( prev_blob )     # loopback
         self.add_layer( self.layer )
     def add_dropout_layer(self, items):
+        """
+        Add a layer to the layer.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "drop"+str(self.lnum)
         self.layer = CaffeDropoutLayer( lname, items['probability'] )
@@ -213,6 +333,10 @@ class CaffeProtoGenerator:
         self.layer.top.append( prev_blob )     # loopback
         self.add_layer( self.layer )
     def add_softmax_layer(self, items):
+        """
+        Add a softmax layer to the layer.
+
+        """
         prev_blob = self.layer.top[0]
         lname = "prob"
         self.layer = CaffeSoftmaxLayer( lname )
@@ -220,8 +344,16 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )
         self.add_layer( self.layer )
     def finalize(self, name):
+        """
+        Finalize the layer.
+
+        """
         self.layer.top[0] = name    # replace
     def write(self, fname):
+        """
+        Write the configuration to a file.
+
+        """
         with open(fname, 'w') as f:
             f.write('name: "{}"'.format(self.name))
             for sec in self.sections:
@@ -232,12 +364,20 @@ class CaffeProtoGenerator:
 class uniqdict(OrderedDict):
     _unique = 0
     def __setitem__(self, key, val):
+        """
+        Set a key to the value pair.
+
+        """
         if isinstance(val, OrderedDict):
             self._unique += 1
             key += "_"+str(self._unique)
         OrderedDict.__setitem__(self, key, val)
 
 def convert(cfgfile, ptxtfile):
+    """
+    Convert a cfgaffefile.
+
+    """
     #
     parser = ConfigParser(dict_type=uniqdict)
     parser.read(cfgfile)
@@ -284,6 +424,10 @@ def convert(cfgfile, ptxtfile):
     gen.write(ptxtfile)
 
 def main():
+    """
+    Main function.
+
+    """
     parser = argparse.ArgumentParser(description='Convert YOLO cfg to Caffe prototxt')
     parser.add_argument('cfg', type=str, help='YOLO cfg')
     parser.add_argument('prototxt', type=str, help='Caffe prototxt')

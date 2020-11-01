@@ -11,6 +11,10 @@ from matplotlib import colors
 
 class FPS:
     def __init__(self):
+        """
+        Initialize the start.
+
+        """
         # store the start time, end time, and total number of frames
         # that were examined between the start and end intervals
         self._start = None
@@ -18,31 +22,55 @@ class FPS:
         self._numFrames = 0
 
     def start(self):
+        """
+        Starts the task.
+
+        """
         # start the timer
         self._start = datetime.datetime.now()
         return self
 
     def stop(self):
+        """
+        Stops the timer.
+
+        """
         # stop the timer
         self._end = datetime.datetime.now()
 
     def update(self):
+        """
+        Updates the next numFrames.
+
+        """
         # increment the total number of frames examined during the
         # start and end intervals
         self._numFrames += 1
 
     def elapsed(self):
+        """
+        Returns the elapsed time.
+
+        """
         # return the total number of seconds between the start and
         # end interval
         return (self._end - self._start).total_seconds()
 
     def fps(self):
+        """
+        Return the number of seconds.
+
+        """
         # compute the (approximate) frames per second
         return self._numFrames / self.elapsed()
 
 
 class WebcamVideoStream:
     def __init__(self, src, width, height):
+        """
+        Initialize image.
+
+        """
         # initialize the video camera stream and read the first frame
         # from the stream
         #print(src)
@@ -56,11 +84,19 @@ class WebcamVideoStream:
         self.stopped = False
 
     def start(self):
+        """
+        Starts a new thread.
+
+        """
         # start the thread to read frames from the video stream
         Thread(target=self.update, args=()).start()
         return self
 
     def update(self):
+        """
+        Update the stream.
+
+        """
         # keep looping infinitely until the thread is stopped
         while True:
             # if the thread indicator variable is set, stop the thread
@@ -71,15 +107,27 @@ class WebcamVideoStream:
             (self.grabbed, self.frame) = self.stream.read()
 
     def read(self):
+        """
+        Read a single frame.
+
+        """
         # return the frame most recently read
         return self.frame
 
     def stop(self):
+        """
+        Stop the thread.
+
+        """
         # indicate that the thread should be stopped
         self.stopped = True
 
 
 def standard_colors():
+    """
+    Returns a list of colors.
+
+    """
     colors = [
         'AliceBlue', 'Chartreuse', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque',
         'BlanchedAlmond', 'BlueViolet', 'BurlyWood', 'CadetBlue', 'AntiqueWhite',
@@ -109,6 +157,10 @@ def standard_colors():
 
 
 def color_name_to_rgb():
+    """
+    Convert a color name to a color name.
+
+    """
     colors_rgb = []
     for key, value in colors.cnames.items():
         colors_rgb.append((key, struct.unpack('BBB', bytes.fromhex(value.replace('#', '')))))

@@ -5,6 +5,10 @@ import time
 
 
 def read_camera(camera, yoloNCS):
+    """
+    Reads an image from an image.
+
+    """
 
     while True:
         img = camera.get_frame_cv2_format()
@@ -24,6 +28,10 @@ def read_camera(camera, yoloNCS):
             break
 
 def get_camera():
+    """
+    Return a camera object
+
+    """
     if os.uname()[4].startswith("arm"):
         #Raaspberry Pi version
         print('Use R-Pi camera')

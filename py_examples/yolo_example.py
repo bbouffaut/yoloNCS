@@ -5,6 +5,10 @@ from datetime import datetime
 from skimage.transform import resize
 
 def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, grid_size=7):
+    """
+    Preprocess boxes.
+
+    """
     # extract boxes from output
     w_img = img_width
     h_img = img_height
@@ -27,6 +31,10 @@ def preprocess_boxes(output, img_width, img_height, num_class=20, num_box=2, gri
     return boxes
 
 def filter_boxes(output, boxes, grid_size, num_box, num_class, threshold=0.2):
+    """
+    Filter boxes based on the given grid.
+
+    """
 
     # Filter boexes based on computed probability and threshol
 
@@ -54,6 +62,10 @@ def filter_boxes(output, boxes, grid_size, num_box, num_class, threshold=0.2):
     return probs_filtered, boxes_filtered, classes_num_filtered
 
 def iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_threshold=0.5):
+    """
+    Filters out the filtered filtered by each set is in each set.
+
+    """
 
     for i in range(len(boxes_filtered)):
     	if probs_filtered[i] == 0 : continue
@@ -70,6 +82,10 @@ def iou_filter(probs_filtered, boxes_filtered, classes_num_filtered, iou_thresho
 
 
 def interpret_output(output, img_width, img_height):
+    """
+    Takes a list of the output
+
+    """
     classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
     threshold = 0.2
     iou_threshold = 0.5
@@ -94,6 +110,10 @@ def interpret_output(output, img_width, img_height):
     return result
 
 def iou(box1,box2):
+    """
+    Computes the intersection of two boxes.
+
+    """
 	tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
 	lr = min(box1[1]+0.5*box1[3],box2[1]+0.5*box2[3])-max(box1[1]-0.5*box1[3],box2[1]-0.5*box2[3])
 	if tb < 0 or lr < 0 : intersection = 0
@@ -102,6 +122,10 @@ def iou(box1,box2):
 
 
 def show_results(img, results, img_width, img_height):
+    """
+    Show results in the results of the image.
+
+    """
 	img_cp = img.copy()
 	disp_console = True
 	imshow = True

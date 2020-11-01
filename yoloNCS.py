@@ -8,6 +8,10 @@ from yolo_config import cfg
 class YoloNCS():
 
     def __init__(self, ncs_graph_file):
+        """
+        Initialize the graph.
+
+        """
         network_blob = ncs_graph_file
         # configuration NCS
         mvnc.global_set_option(mvnc.GlobalOption.RW_LOG_LEVEL, 2)
@@ -42,6 +46,10 @@ class YoloNCS():
         self.colors = generate_colors(cfg.CLASSES)
 
     def close_ressources(self):
+        """
+        Close all output device.
+
+        """
         # deallocate ressources
         self.input_fifo.destroy()
         self.output_fifo.destroy()
@@ -50,6 +58,10 @@ class YoloNCS():
         self.device.destroy()
 
     def process_image(self, cv2_image):
+        """
+        Processes image to image
+
+        """
         # preprocess cv2 image (resize, reshape...)
         im = preprocess_image(cv2_image)
 
